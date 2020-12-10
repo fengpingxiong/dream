@@ -34,6 +34,7 @@ function createSound() {
     sound.setLoop(true);
     sound.setVolume(1);
     sound.play();
+
   });
 
 }
@@ -42,13 +43,14 @@ let sphere = null;
 
 function createSphere() {
   const geometry = new THREE.SphereGeometry( 20, 100, 100 );
-  const material = new THREE.MeshPhongMaterial( { color: 0xc2a68c, specular: 0xff0000, shininess:10, transparent: true, opacity : 0.3} );
+  const material = new THREE.MeshPhongMaterial( { color: 0xc2a68c, specular: 0xff0000, shininess:10, transparent: true, opacity : 0.2} );
   sphere = new THREE.Mesh( geometry, material );
-  const position = new THREE.Vector3(-30, 20, -1000);
+  const position = new THREE.Vector3(-30, 20, -1500);
   sphere.position.copy(position);
   scene.add( sphere );
 }
 
+let box = null;
 
 function createBox() {
   const geometry = new THREE.BoxBufferGeometry(60, 60, 60);
@@ -62,25 +64,23 @@ function createBox() {
 
   const material = new THREE.MeshStandardMaterial({
     map: texture,
-    // bumpMap: texture,
-    // bumpScale: 5,
     transparent: true,
-    opacity: 0.5
+    opacity: 0.3
 
   });
 
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.rotation.x = - Math.PI / 2.2;
-  mesh.position.y = 10;
-  mesh.receiveShadow = true;
-  mesh.castShadow = true;
+  box = new THREE.Mesh(geometry, material);
+  box.rotation.x = - Math.PI / 2.2;
+  box.position.y = 10;
+  box.receiveShadow = true;
+  box.castShadow = true;
 
-  const position = new THREE.Vector3(-30, 40, -1000);
-  mesh.position.copy(position);
+  const position = new THREE.Vector3(-30, 40, -2000);
+  box.position.copy(position);
 
-  datas.push(mesh);
+  datas.push(box);
 
-  scene.add(mesh);
+  scene.add(box);
 }
 
 let dolphin = null;
@@ -88,7 +88,7 @@ let dolphin = null;
 function loadDolphin() {
   const url = "game-ready_dolphin_swimming/scene.gltf";
   const onLoad = (gltf) => {
-    const position = new THREE.Vector3(4, -20, -100);
+    const position = new THREE.Vector3(-20, -20, -100);
     gltf.scene.position.copy(position);
     gltf.scene.rotation.y = 1.5;
     gltf.scene.scale.set(2, 2, 2);
@@ -131,9 +131,9 @@ function loadHuman() {
   const url = "human_animation_set/scene.gltf";
 
   const onLoad = (gltf) => {
-    const position = new THREE.Vector3(-30, 0, -400);
+    const position = new THREE.Vector3(-30, 0, -180);
     gltf.scene.position.copy(position);
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
+    gltf.scene.scale.set(0.12, 0.12, 0.12);
     scene.add(gltf.scene);
 
     const model = gltf.scene.children[0];
@@ -158,9 +158,9 @@ function loadDeer() {
   const url = "deer_23/scene.gltf";
 
   const onLoad = (gltf) => {
-    const position = new THREE.Vector3(-30, 0, -200);
+    const position = new THREE.Vector3(-30, 0, -130);
     gltf.scene.position.copy(position);
-    gltf.scene.scale.set(10, 10, 10);
+    gltf.scene.scale.set(2, 2, 2);
     scene.add(gltf.scene);
 
     const model = gltf.scene.children[0];
@@ -204,7 +204,6 @@ function init() {
   light = new THREE.AmbientLight(0xc3d1d9, 1);
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 20000);
-  // camera.position.set( 0, 30, 39.507533623805514 );
   sun = new THREE.Vector3();
   var waterGeometry = new THREE.PlaneBufferGeometry(10000, 20000);
 
@@ -237,8 +236,12 @@ function init() {
 
   var uniforms = sky.material.uniforms;
 
+  // uniforms['turbidity'].value = 1;
+  // uniforms['rayleigh'].value = 5;
+  // uniforms['mieCoefficient'].value = 0.005;
+  // uniforms['mieDirectionalG'].value = 0.8;
   uniforms['turbidity'].value = 1;
-  uniforms['rayleigh'].value = 5;
+  uniforms['rayleigh'].value = 6;
   uniforms['mieCoefficient'].value = 0.005;
   uniforms['mieDirectionalG'].value = 0.8;
 
@@ -270,7 +273,7 @@ function init() {
   controls.maxPolarAngle = Math.PI * 0.45;
   controls.target.set(0, 10, 0);
   controls.minDistance = 40.0;
-  controls.maxDistance = 500.0;
+  controls.maxDistance = 200.0;
   controls.update();
 
   stats = new Stats();
@@ -294,36 +297,36 @@ setTimeout(function () {
 
 setTimeout(function () {
   loadHuman();
-}, 10500);
+}, 12500);
 
 setTimeout(function () {
   createBox();
   // loadCookie();
-}, 21000);
+}, 30000);
 
 setTimeout(function () {
   createSphere();
-}, 24500);
+}, 31000);
 
 function moves() {
   if (deer && deer.position) {
 
-    if (deer.position.z <= 150) {
-      deer.position.z += 0.49;
+    if (deer.position.z <= 6000) {
+      deer.position.z += 0.43;
     }
 
-    if (deer.position.x <= 3) {
+    if (deer.position.x <= 15) {
       deer.position.x += 0.1;
     }
   }
 
   if (human && human.position) {
 
-    if (human.position.z <= 5500) {
+    if (human.position.z <= 6000) {
       human.position.z += 2;
     }
 
-    if (human.position.x <= 55) {
+    if (human.position.x <= 250) {
       human.position.x += 0.3;
     }
   }
@@ -339,15 +342,13 @@ function moves() {
   //   }
   // }
 
-  for (let i = 0; i < datas.length; i++) {
-    const mesh = datas[i];
-    if (mesh && mesh.position) {
-      if (mesh.position.z <= 5500) {
-        mesh.position.z += 2.5;
+    if (box && box.position) {
+      if (box.position.z <= 5500) {
+        box.position.z += 2.3;
       }
 
-      if (mesh.position.x <= 0) {
-        mesh.position.x += 0.5;
+      if (box.position.x <= 0) {
+        box.position.x += 0.4;
       }
     }
 
@@ -361,9 +362,8 @@ function moves() {
         sphere.position.x += 0.3;
       }
     }
-  }
-
 }
+
 
 function update() {
   const delta = clock.getDelta();
@@ -404,7 +404,7 @@ function App() {
 
   animate();
 
-  document.addEventListener('keyup', () => {
+  document.addEventListener('click', () => {
     createSound();
   })
 
