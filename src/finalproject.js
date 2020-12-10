@@ -10,13 +10,11 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 var container, stats;
 var camera, scene, renderer;
-var controls, water, sun, mesh;
+var controls, water, sun;
 var light;
-let newMaterial;
-let standardMaterial;
-let newStandard;
 const mixers = [];
 const clock = new THREE.Clock();
+const datas = [];
 
 const loader = new GLTFLoader();
 const onProgress = () => { };
@@ -40,33 +38,49 @@ function createSound() {
 
 }
 
-function createMaterial() {
-  //let diffuseColor = 0xfcfafa;
-  newMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, skinning: true });
-  standardMaterial = new THREE.MeshStandardMaterial({ color: 0x8e80ab, skinning: true });
+let sphere = null;
+
+function createSphere() {
+  const geometry = new THREE.SphereGeometry( 20, 100, 100 );
+  const material = new THREE.MeshPhongMaterial( { color: 0xc2a68c, specular: 0xff0000, shininess:10, transparent: true, opacity : 0.3} );
+  sphere = new THREE.Mesh( geometry, material );
+  const position = new THREE.Vector3(-30, 20, -1000);
+  sphere.position.copy(position);
+  scene.add( sphere );
+}
+
+
+function createBox() {
+  const geometry = new THREE.BoxBufferGeometry(60, 60, 60);
   const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load('textures/wave-textures-white-background-vector_53876-60286.jpg');
+  const texture = textureLoader.load("codegreen.jpeg", function (texture) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  });
+  texture.repeat.set(2, 2);
   texture.encoding = THREE.sRGBEncoding;
   texture.anisotropy = 16;
-  const imgTexture = new THREE.TextureLoader().load('pinkCloudBlueSky.jpg');
-  imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-  imgTexture.anisotropy = 16;
-  newStandard = new THREE.MeshStandardMaterial({
-    //map: imgTexture,
-    //color: 0xfcfafa,
-    //bumpMap: imgTexture,
-    //bumpScale: 1,
-    //displacementMap: imgTexture,
-    //displacementScale: 1,
-    envMap: imgTexture,
-    skinning: true
-  });
-  //  pointsMaterial = new THREE.pointsMaterial({
-  //    color: diffuseColor,
-  //    sizeAttenuation: true,
-  //    size: 0.1
-  //  });
 
+  const material = new THREE.MeshStandardMaterial({
+    map: texture,
+    // bumpMap: texture,
+    // bumpScale: 5,
+    transparent: true,
+    opacity: 0.5
+
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = - Math.PI / 2.2;
+  mesh.position.y = 10;
+  mesh.receiveShadow = true;
+  mesh.castShadow = true;
+
+  const position = new THREE.Vector3(-30, 40, -1000);
+  mesh.position.copy(position);
+
+  datas.push(mesh);
+
+  scene.add(mesh);
 }
 
 let dolphin = null;
@@ -76,10 +90,7 @@ function loadDolphin() {
   const onLoad = (gltf) => {
     const position = new THREE.Vector3(4, -20, -100);
     gltf.scene.position.copy(position);
-
-
     gltf.scene.rotation.y = 1.5;
-
     gltf.scene.scale.set(2, 2, 2);
     scene.add(gltf.scene);
 
@@ -96,26 +107,24 @@ function loadDolphin() {
     action.play();
   };
 
-  loader.load(url, gltf => onLoad(gltf, newMaterial), onProgress, onError);
+  loader.load(url, gltf => onLoad(gltf), onProgress, onError);
 }
 
-let cookie = null;
-
-function loadCookie() {
-  const url = "cookie/scene.gltf";
-
-  const position = new THREE.Vector3(-30, 40, -1000);
-
-  const onLoad = (gltf) => {
-    gltf.scene.position.copy(position);
-    gltf.scene.scale.set(0.3, 0.3, 0.3); // scale here
-    scene.add(gltf.scene);
-
-    cookie = gltf.scene.children[0];
-  };
-  loader.load(url, gltf => onLoad(gltf, newStandard), onProgress, onError);
-
-}
+// let cookie = null;
+//
+// function loadCookie() {
+//   const url = "cookie/scene.gltf";
+//   const position = new THREE.Vector3(-30, 40, -1000);
+//   const onLoad = (gltf) => {
+//     gltf.scene.position.copy(position);
+//     gltf.scene.scale.set(0.3, 0.3, 0.3); // scale here
+//     scene.add(gltf.scene);
+//
+//     cookie = gltf.scene.children[0];
+//   };
+//   loader.load(url, gltf => onLoad(gltf, newStandard), onProgress, onError);
+//
+// }
 
 let human = null;
 function loadHuman() {
@@ -140,7 +149,7 @@ function loadHuman() {
     action.play();
   };
 
-  loader.load(url, gltf => onLoad(gltf, newMaterial), onProgress, onError);
+  loader.load(url, gltf => onLoad(gltf), onProgress, onError);
 }
 
 let deer = null;
@@ -167,7 +176,7 @@ function loadDeer() {
     action.play();
   };
 
-  loader.load(url, gltf => onLoad(gltf, newMaterial), onProgress, onError);
+  loader.load(url, gltf => onLoad(gltf), onProgress, onError);
 }
 
 function loadChair() {
@@ -180,7 +189,7 @@ function loadChair() {
     scene.add(gltf.scene);
   };
 
-  loader.load(url, gltf => onLoad(gltf, newStandard), onProgress, onError);
+  loader.load(url, gltf => onLoad(gltf), onProgress, onError);
 
 }
 
@@ -195,6 +204,7 @@ function init() {
   light = new THREE.AmbientLight(0xc3d1d9, 1);
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 1, 20000);
+  // camera.position.set( 0, 30, 39.507533623805514 );
   sun = new THREE.Vector3();
   var waterGeometry = new THREE.PlaneBufferGeometry(10000, 20000);
 
@@ -256,13 +266,8 @@ function init() {
 
   updateSun();
 
-  var geometry = new THREE.BoxBufferGeometry(0, 0,);
-  var material = new THREE.MeshStandardMaterial({ roughness: 0 });
-
-  mesh = new THREE.Mesh(geometry, material);
-
   controls = new OrbitControls(camera, renderer.domElement);
-  controls.maxPolarAngle = Math.PI * 0.495;
+  controls.maxPolarAngle = Math.PI * 0.45;
   controls.target.set(0, 10, 0);
   controls.minDistance = 40.0;
   controls.maxDistance = 500.0;
@@ -281,6 +286,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+
 setTimeout(function () {
   loadDeer();
   loadDolphin();
@@ -291,8 +297,13 @@ setTimeout(function () {
 }, 10500);
 
 setTimeout(function () {
-  loadCookie();
-}, 21500);
+  createBox();
+  // loadCookie();
+}, 21000);
+
+setTimeout(function () {
+  createSphere();
+}, 24500);
 
 function moves() {
   if (deer && deer.position) {
@@ -317,16 +328,41 @@ function moves() {
     }
   }
 
-  if (cookie && cookie.position) {
+  // if (cookie && cookie.position) {
+  //
+  //   if (cookie.position.z <= 5500) {
+  //     cookie.position.z += 4;
+  //   }
+  //
+  //   if (cookie.position.x <= 55) {
+  //     cookie.position.x += 0.3;
+  //   }
+  // }
 
-    if (cookie.position.z <= 5500) {
-      cookie.position.z += 4;
+  for (let i = 0; i < datas.length; i++) {
+    const mesh = datas[i];
+    if (mesh && mesh.position) {
+      if (mesh.position.z <= 5500) {
+        mesh.position.z += 2.5;
+      }
+
+      if (mesh.position.x <= 0) {
+        mesh.position.x += 0.5;
+      }
     }
 
-    if (cookie.position.x <= 55) {
-      cookie.position.x += 0.3;
+    if (sphere && sphere.position) {
+
+      if (sphere.position.z <= 5500) {
+        sphere.position.z += 1;
+      }
+
+      if (sphere.position.x <= 0) {
+        sphere.position.x += 0.3;
+      }
     }
   }
+
 }
 
 function update() {
@@ -345,12 +381,17 @@ function animate() {
 }
 
 function render() {
-  //console.log(camera);
+  // console.log(camera);
   var time = performance.now() * 0.001;
-  mesh.position.x = Math.sin(time) * 20;
-  mesh.position.z = Math.cos(time) * 20;
-  mesh.rotation.x = time * 0.5;
-  mesh.rotation.z = time * 0.51;
+  // mesh.position.x = Math.sin(time) * 20;
+  // mesh.position.z = Math.cos(time) * 20;
+  for (let i = 0; i < datas.length; i++) {
+    const mesh = datas[i];
+    mesh.rotation.x = time * 0.3;
+    // mesh.rotation.y = time * 4;
+    mesh.rotation.z = time * 0.3;
+  }
+
   water.material.uniforms['time'].value += 1.0 / 60.0;
 
   renderer.render(scene, camera);
@@ -359,7 +400,6 @@ function render() {
 function App() {
   init();
 
-  createMaterial();
   loadChair();
 
   animate();
