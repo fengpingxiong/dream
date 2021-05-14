@@ -1,7 +1,6 @@
 {
   "name": "float-world",
   "version": "0.1.0",
-  "homepage": "https://fengpingxiong.github.io/dream",
   "private": true,
   "dependencies": {
     "@babel/core": "7.9.0",
@@ -57,7 +56,6 @@
     "semver": "6.3.0",
     "style-loader": "0.23.1",
     "terser-webpack-plugin": "2.3.8",
-    "three": "^0.120.1",
     "ts-pnp": "1.1.6",
     "url-loader": "2.3.0",
     "webpack": "4.42.0",
@@ -141,5 +139,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "three": "^0.120.1"
   }
 }

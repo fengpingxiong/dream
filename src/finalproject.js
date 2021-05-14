@@ -302,32 +302,32 @@ setTimeout(function () {
 setTimeout(function () {
   createBox();
   // loadCookie();
-}, 30000);
+}, 22000);
 
 setTimeout(function () {
   createSphere();
-}, 31000);
+}, 30000);
 
 function moves() {
   if (deer && deer.position) {
 
     if (deer.position.z <= 6000) {
-      deer.position.z += 0.43;
+      deer.position.z += 0.87;
     }
 
     if (deer.position.x <= 15) {
-      deer.position.x += 0.1;
+      deer.position.x += 0.3;
     }
   }
 
   if (human && human.position) {
 
     if (human.position.z <= 6000) {
-      human.position.z += 2;
+      human.position.z += 7;
     }
 
     if (human.position.x <= 250) {
-      human.position.x += 0.3;
+      human.position.x += 1;
     }
   }
 
@@ -344,7 +344,7 @@ function moves() {
 
     if (box && box.position) {
       if (box.position.z <= 5500) {
-        box.position.z += 2.3;
+        box.position.z += 3;
       }
 
       if (box.position.x <= 0) {
@@ -355,7 +355,7 @@ function moves() {
     if (sphere && sphere.position) {
 
       if (sphere.position.z <= 5500) {
-        sphere.position.z += 1;
+        sphere.position.z += 6;
       }
 
       if (sphere.position.x <= 0) {

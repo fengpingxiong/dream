@@ -3,7 +3,7 @@
 // import AS2 from "./assignment2";
 // export default AS2;
 
-import FinalProject from "./finalproject";
+import FinalProject from "./particle2";
 export default FinalProject;
 
 // import Final2 from "./final2";
